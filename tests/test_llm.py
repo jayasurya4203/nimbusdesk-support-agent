@@ -41,6 +41,24 @@ def test_backoff_waits_for_the_server_hint(monkeypatch: pytest.MonkeyPatch) -> N
     assert slept and slept[0] >= 43.0
 
 
+def test_daily_quota_hint_fails_fast_instead_of_sleeping_for_hours(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    slept: list[float] = []
+    monkeypatch.setattr(llm.time, "sleep", slept.append)
+    attempts = {"count": 0}
+
+    def exhausted() -> str:
+        attempts["count"] += 1
+        raise _FakeAPIError("64550s")
+
+    with pytest.raises(llm.LLMError):
+        llm.retry_with_backoff(exhausted, max_retries=4, base_delay_s=0.1)
+
+    assert attempts["count"] == 1
+    assert slept == []
+
+
 def test_embedder_paces_inputs_under_the_minute_budget(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

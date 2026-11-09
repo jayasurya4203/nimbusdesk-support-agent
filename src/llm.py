@@ -32,6 +32,10 @@ _RETRYABLE_MARKERS = (
 
 _FENCE_RE = re.compile(r"^```(?:json)?\s*|\s*```$", re.IGNORECASE)
 
+# Retrying inside a request only makes sense for short throttle windows. A hint
+# beyond this usually means a daily quota that will not reset while we wait.
+_MAX_INLINE_RETRY_DELAY_S = 120.0
+
 
 class LLMError(RuntimeError):
     """Raised when the model call fails after retries or returns invalid data."""
@@ -78,8 +82,16 @@ def retry_with_backoff(
             last_error = exc
             if attempt >= max_retries - 1 or not _is_retryable(exc):
                 break
+            server_delay = _server_retry_delay(exc)
+            if server_delay > _MAX_INLINE_RETRY_DELAY_S:
+                LOGGER.error(
+                    "%s hit a quota that resets in %.0fs; not retrying in-request",
+                    label,
+                    server_delay,
+                )
+                break
             delay = base_delay_s * (2**attempt) + random.uniform(0, 0.5)
-            delay = max(delay, _server_retry_delay(exc) + 1.0)
+            delay = max(delay, server_delay + 1.0)
             LOGGER.warning(
                 "%s failed (attempt %d/%d): %s. Retrying in %.1fs",
                 label,
