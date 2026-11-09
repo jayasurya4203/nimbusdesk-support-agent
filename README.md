@@ -4,6 +4,8 @@ A production-shaped support agent that **detects who is asking**, **retrieves ev
 
 Built for the Adsparkx AI engineering assignment. Every answer is generated live from the indexed documents — there are no canned responses, and the repository contains no pre-generated model output.
 
+**Repository:** <https://github.com/jayasurya4203/nimbusdesk-support-agent>
+
 ---
 
 ## What it does
@@ -19,7 +21,7 @@ Built for the Adsparkx AI engineering assignment. Every answer is generated live
 
 ## Demo
 
-> A screen recording (3–8 minutes) and deployed URL will be added after publishing. The recording walks through the nine scripted scenarios below.
+> A screen recording (3–8 minutes) and deployed URL will be added after publishing to Streamlit Community Cloud. The recording walks through the nine scripted scenarios below.
 
 ![Streamlit chat showing a Business Executive badge at 95% confidence, a grounded answer with plan-based uptime commitments, and retrieved sources](docs/screenshot.png)
 
@@ -441,5 +443,5 @@ Coverage includes:
 - [x] Interactive CLI and Streamlit chat UI
 - [x] Tests with fake providers (no network/API key)
 - [ ] Screen recording (3–8 minutes) — link here
-- [ ] Public GitHub repository URL — link here
+- [x] Public GitHub repository — <https://github.com/jayasurya4203/nimbusdesk-support-agent>
 - [ ] Published/deployed link — link here
