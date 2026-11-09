@@ -19,7 +19,7 @@ Built for the Adsparkx AI engineering assignment. Every answer is generated live
 
 ## Demo
 
-> A screen recording (3–8 minutes) and deployed URL will be added after publishing. The recording walks through the five scripted scenarios below.
+> A screen recording (3–8 minutes) and deployed URL will be added after publishing. The recording walks through the nine scripted scenarios below.
 
 ![Streamlit chat showing a Business Executive badge at 95% confidence, a grounded answer with plan-based uptime commitments, and retrieved sources](docs/screenshot.png)
 
@@ -93,7 +93,7 @@ The orchestration is explicit Python (`src/agent.py`) rather than an opaque agen
 │   ├── build_kb_pdf.py         Regenerates the PDF KB article (dev only)
 │   ├── demo.py                 Nine-scenario end-to-end demo + transcript
 │   └── ingest.py               Index build / freshness check / dry run
-├── tests/                      104 pytest tests (fake LLM + fake embedder; no API calls)
+├── tests/                      105 pytest tests (fake LLM + fake embedder; no API calls)
 ├── requirements.txt
 ├── requirements-dev.txt
 ├── .env.example
@@ -387,7 +387,7 @@ Notes for hosted deployments:
 ## Testing
 
 ```bash
-pytest -q          # 104 tests
+pytest -q          # 105 tests
 ruff check .       # lint (E/F/I rule set pinned in ruff.toml)
 ```
 

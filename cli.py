@@ -20,7 +20,7 @@ from src.config import ConfigurationError, Settings
 from src.models import AgentReply, Persona
 
 if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(errors="replace")
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 _COLORS = {
     "bold": "1",
