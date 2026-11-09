@@ -19,11 +19,11 @@ Built for the Adsparkx AI engineering assignment. Every answer is generated live
 
 ## Demo
 
-> Add a screen recording (3–8 minutes) and a deployed URL here after publishing. The recording should show the five scripted scenarios below.
+> A screen recording (3–8 minutes) and deployed URL will be added after publishing. The recording walks through the five scripted scenarios below.
 
-```
-docs/screenshot.png   (captured from the running Streamlit app)
-```
+![Streamlit chat showing a Business Executive badge at 95% confidence, a grounded answer with plan-based uptime commitments, and retrieved sources](docs/screenshot.png)
+
+*Live run: the executive question was answered from `service_level_agreement.md` with retrieval 0.76 and response 0.89 — no escalation.*
 
 ---
 
