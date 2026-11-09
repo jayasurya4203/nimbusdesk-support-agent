@@ -195,6 +195,67 @@ def test_non_list_steps_and_excess_steps_are_sanitised() -> None:
     assert len(steps) == 8
 
 
+def test_frustrated_answer_includes_steps_when_the_model_splits_them_out() -> None:
+    llm = ScriptedLLM(
+        generation={
+            **DEFAULT_GENERATION,
+            "answer": "Please follow these steps to clear your cookies.",
+            "steps": ["Open browser settings", "Clear site data", "Sign in again"],
+        }
+    )
+
+    result = ResponseGenerator(llm).generate(
+        query="cookies",
+        persona_result=_persona(Persona.FRUSTRATED),
+        chunks=_chunks(),
+    )
+
+    assert result.answer == (
+        "Please follow these steps to clear your cookies.\n\n"
+        "1. Open browser settings\n2. Clear site data\n3. Sign in again"
+    )
+
+
+def test_numbered_steps_already_in_the_answer_are_not_duplicated() -> None:
+    answer = (
+        "Here is the fix:\n\n"
+        "1. Open browser settings\n2. Clear site data\n3. Sign in again"
+    )
+    llm = ScriptedLLM(
+        generation={
+            **DEFAULT_GENERATION,
+            "answer": answer,
+            "steps": ["Open browser settings", "Clear site data", "Sign in again"],
+        }
+    )
+
+    result = ResponseGenerator(llm).generate(
+        query="cookies",
+        persona_result=_persona(Persona.FRUSTRATED),
+        chunks=_chunks(),
+    )
+
+    assert result.answer == answer
+
+
+def test_executive_answers_keep_steps_out_of_the_body() -> None:
+    llm = ScriptedLLM(
+        generation={
+            **DEFAULT_GENERATION,
+            "answer": "Bottom line: cookies must be cleared before sign-in.",
+            "steps": ["Open browser settings", "Clear site data"],
+        }
+    )
+
+    result = ResponseGenerator(llm).generate(
+        query="cookies",
+        persona_result=_persona(Persona.EXECUTIVE),
+        chunks=_chunks(),
+    )
+
+    assert result.answer == "Bottom line: cookies must be cleared before sign-in."
+
+
 @pytest.mark.parametrize(
     ("persona", "expected_style"),
     [
