@@ -275,7 +275,12 @@ cp .env.example .env
 
 ```toml
 GEMINI_API_KEY = "..."
+# Recommended on the free tier: gemini-2.5-flash allows only 20 generated
+# requests per day, so the demo exhausts it quickly.
+CHAT_MODEL = "gemini-3.1-flash-lite"
 ```
+
+A denied quota surfaces as the fail-safe path: persona falls back to rules and the case is escalated with "the answer generator was unavailable" rather than answered without evidence.
 
 ### 3. Build the index
 
@@ -311,7 +316,7 @@ The demo calls the real Gemini agent across nine scenarios and writes `demo_outp
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `GEMINI_API_KEY` | — | Required for ingestion, generation, and the UI |
-| `CHAT_MODEL` | `gemini-2.5-flash` | Persona, generation, and handoff model |
+| `CHAT_MODEL` | `gemini-2.5-flash` | Persona, generation, and handoff model. The free tier caps this model at 20 generated requests/day; `gemini-3.1-flash-lite` has a separate quota. |
 | `EMBEDDING_MODEL` | `gemini-embedding-001` | Embedding model |
 | `EMBEDDING_DIMENSIONS` | `768` | Output dimensionality |
 | `EMBEDDING_BATCH_SIZE` | `32` | Ingestion batch size |

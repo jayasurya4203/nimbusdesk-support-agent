@@ -25,6 +25,23 @@ def test_server_retry_delay_reads_retry_info() -> None:
     assert llm._server_retry_delay(RuntimeError("no details")) == 0.0
 
 
+def test_gemini_client_pins_v1beta_for_system_instructions(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from google import genai
+
+    captured: dict = {}
+
+    class _Client:
+        def __init__(self, **kwargs) -> None:
+            captured.update(kwargs)
+
+    monkeypatch.setattr(genai, "Client", _Client)
+    llm.GeminiLLM(api_key="test-key")
+
+    assert captured["http_options"] == {"api_version": "v1beta"}
+
+
 def test_backoff_waits_for_the_server_hint(monkeypatch: pytest.MonkeyPatch) -> None:
     slept: list[float] = []
     monkeypatch.setattr(llm.time, "sleep", slept.append)

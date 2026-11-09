@@ -155,7 +155,9 @@ class GeminiLLM:
         from google import genai  # imported lazily so tests do not need the SDK
 
         self._genai = genai
-        self._client = genai.Client(api_key=api_key)
+        # v1 rejects system instructions on some models ("Developer instruction
+        # is not enabled for api version v1"); v1beta supports them everywhere.
+        self._client = genai.Client(api_key=api_key, http_options={"api_version": "v1beta"})
         self.model = model
         self.max_retries = max_retries
         self.base_delay_s = base_delay_s
