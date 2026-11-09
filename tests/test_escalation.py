@@ -14,7 +14,13 @@ from src.escalator import (
     detect_human_request,
     persona_escalation_notice,
 )
-from src.models import EscalationDecision, EscalationReason, GenerationResult, Persona, PersonaResult
+from src.models import (
+    EscalationDecision,
+    EscalationReason,
+    GenerationResult,
+    Persona,
+    PersonaResult,
+)
 
 
 def _persona(

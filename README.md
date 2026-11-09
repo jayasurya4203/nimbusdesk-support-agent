@@ -11,7 +11,7 @@ Built for the Adsparkx AI engineering assignment. Every answer is generated live
 | Capability | Implementation |
 | --- | --- |
 | Persona detection | Gemini structured JSON + deterministic rule fallback + session hysteresis; surfaced in the CLI, Streamlit, and every API reply |
-| Grounded RAG | 19 realistic NimbusDesk support documents (18 Markdown/text + 1 three-page PDF), Gemini embeddings, ChromaDB cosine search, BM25+ hybrid re-ranking, citations required |
+| Grounded RAG | 19 realistic NimbusDesk support documents (18 Markdown/text + 1 three-page PDF), Gemini embeddings, ChromaDB cosine search, BM25 hybrid re-ranking, citations required |
 | Adaptive answers | Different system instruction, structure, length, and jargon level per persona; all claims must come from retrieved chunks |
 | Escalation | Deterministic sensitive-topic rules, retrieval-confidence checks, grounding/citation checks, repeated-dissatisfaction tracking, unresolved-conversation limit, explicit human requests |
 | Human handoff | Structured JSON + readable Markdown ticket with persona, issue, transcript, documents used, attempted steps, recommended next steps, and escalation reasons |
@@ -145,7 +145,7 @@ All personas share the same grounding rules: answer only from supplied chunks, s
 
 - `gemini-embedding-001`, **768 dimensions**, `RETRIEVAL_DOCUMENT` for chunks and `RETRIEVAL_QUERY` for questions, L2-normalized.
 - ChromaDB persistent client in cosine space; collection metadata repeats the embedding model and chunk parameters.
-- Retrieval fetches 15 dense candidates, re-ranks with **BM25+**, and fuses `0.82 × dense + 0.18 × lexical`. BM25 is guarded by a token-overlap check so an unrelated chunk cannot receive points from absent terms. This hybrid is what keeps exact tokens such as `401`, `SAML`, `nk_live_`, and `Retry-After` retrievable.
+- Retrieval fetches 15 dense candidates, re-ranks with **BM25Okapi** damped by query-token coverage, and fuses `0.82 × dense + 0.18 × lexical`. Okapi gives zero lexical credit to absent terms, and the coverage factor stops one incidental shared token from outranking a chunk that matches most of the question. This hybrid is what keeps exact tokens such as `401`, `SAML`, `nk_live_`, and `Retry-After` retrievable.
 - Only chunks at or above `MIN_RETRIEVAL_SIMILARITY` are treated as supporting evidence. The best fused score is shown as **retrieval confidence**.
 
 ### Grounding and citations
@@ -319,7 +319,7 @@ The demo calls the real Gemini agent across nine scenarios and writes `demo_outp
 | `CANDIDATE_K` | `15` | Dense candidates before re-ranking |
 | `MIN_RETRIEVAL_SIMILARITY` | `0.52` | Lowest fused score considered supporting evidence |
 | `MIN_SUPPORTING_CHUNKS` | `1` | Minimum supporting chunks |
-| `ENABLE_LEXICAL_RERANK` | `true` | BM25+ hybrid re-ranking |
+| `ENABLE_LEXICAL_RERANK` | `true` | BM25 hybrid re-ranking |
 | `LEXICAL_WEIGHT` | `0.18` | Lexical share of the fused score |
 | `REQUIRE_CITATIONS` | `true` | Escalate answers without verifiable citations |
 | `SENSITIVE_ESCALATION_MODE` | `actions_only` | `actions_only` answers policy questions; `always` escalates any sensitive mention |
@@ -346,7 +346,7 @@ Relative paths resolve against the project root.
 | "Our operational uptime is decreasing. We need a timeline of when billing disputes are resolved and how this affects our SLA." | Business Executive | Bottom line + impact/timeline/next step; cites SLA and refund policy; no escalation (informational) |
 | "I'm experiencing internal errors on ticket pages from our PostgreSQL database integration." | Technical Expert | Connector diagnostics and root-cause steps; cites `database_connectors.md` |
 | "My billing statement has unexpected duplicate charges. I demand an immediate refund!" | Frustrated User | **Escalates** `sensitive_billing_dispute`; billing handoff with ticket ID and refund-safe next steps |
-| "Can you ship a physical welcome kit to our Antarctic research station, and what import tax applies?" | Any | **Escalates** `low_retrieval_confidence`; docs_not_used empty; no invented logistics answer |
+| "Can you ship a physical welcome kit to our Antarctic research station, and what import tax applies?" | Any | **Escalates** `low_retrieval_confidence` with no answer; the handoff lists the weakly retrieved sources at their low scores instead of asserting logistics facts |
 | "Our whole team is locked out of SSO and nobody can log in!" → "I already cleared cookies and tried incognito, and it still doesn't work. This is unacceptable." | Frustrated User | First turn answers; second turn **escalates** `repeated_dissatisfaction` |
 | "I need to speak to a human agent about our renewal." | Any | **Escalates** `human_requested`; handoff includes the request |
 

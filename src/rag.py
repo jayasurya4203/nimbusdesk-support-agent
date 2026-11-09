@@ -104,6 +104,7 @@ class KnowledgeBase:
         self.client = chromadb.PersistentClient(path=str(settings.chroma_dir))
         self.collection = None
         self._bm25 = None
+        self._bm25_plus = None
         self._bm25_ids: list[str] = []
         self._bm25_by_id: dict[str, int] = {}
         self._bm25_tokens: dict[str, set[str]] = {}
@@ -241,10 +242,9 @@ class KnowledgeBase:
         return None
 
     def _build_bm25(self) -> None:
-        # BM25+ is used because its IDF floor stays positive on very small
-        # corpora, where classic BM25Okapi returns all-zero scores.
-        from rank_bm25 import BM25Plus
+        from rank_bm25 import BM25Okapi, BM25Plus
 
+        self._bm25_plus = None
         if self.collection is None:
             self._bm25 = None
             return
@@ -259,10 +259,15 @@ class KnowledgeBase:
             return
         corpus = [tokenize(document or "") for document in documents]
         try:
-            self._bm25 = BM25Plus(corpus)
+            self._bm25 = BM25Okapi(corpus)
+            # Okapi scores zero for terms absent from a chunk, which keeps the
+            # lexical signal precise. Its IDF floor can flatten very small
+            # corpora though, so BM25+ is kept as a per-query fallback.
+            self._bm25_plus = BM25Plus(corpus)
         except Exception:  # noqa: BLE001 - tiny corpora can fail inside BM25
             LOGGER.warning("BM25 index could not be built; using dense retrieval only")
             self._bm25 = None
+            self._bm25_plus = None
         self._bm25_ids = ids
         self._bm25_by_id = {chunk_id: index for index, chunk_id in enumerate(ids)}
         self._bm25_tokens = {
@@ -303,15 +308,22 @@ class KnowledgeBase:
         query_token_set = set(query_tokens)
         if self._bm25 is not None and ids:
             scores = self._bm25.get_scores(query_tokens)
+            if self._bm25_plus is not None and max(scores, default=0.0) <= 0:
+                scores = self._bm25_plus.get_scores(query_tokens)
             for chunk_id in ids:
                 index = self._bm25_by_id.get(chunk_id)
                 if index is None:
                     continue
-                # BM25+ adds a delta for absent terms; require real overlap.
-                if query_token_set.isdisjoint(self._bm25_tokens.get(chunk_id, set())):
-                    lexical_scores[chunk_id] = 0.0
-                else:
-                    lexical_scores[chunk_id] = float(scores[index])
+                # BM25+ rewards chunks for absent terms; BM25Okapi does not.
+                # Damping by query coverage keeps a single incidental token
+                # from outranking a chunk that matches most of the question.
+                tokens = self._bm25_tokens.get(chunk_id, set())
+                coverage = (
+                    len(query_token_set & tokens) / len(query_token_set)
+                    if query_token_set
+                    else 0.0
+                )
+                lexical_scores[chunk_id] = max(0.0, float(scores[index])) * coverage
         max_lexical = max(lexical_scores.values(), default=0.0)
 
         chunks: list[RetrievedChunk] = []
