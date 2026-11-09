@@ -94,6 +94,8 @@ The orchestration is explicit Python (`src/agent.py`) rather than an opaque agen
 │   ├── demo.py                 Nine-scenario end-to-end demo + transcript
 │   └── ingest.py               Index build / freshness check / dry run
 ├── tests/                      105 pytest tests (fake LLM + fake embedder; no API calls)
+├── docs/
+│   └── screenshot.png          Live Streamlit run captured for this README
 ├── requirements.txt
 ├── requirements-dev.txt
 ├── .env.example
