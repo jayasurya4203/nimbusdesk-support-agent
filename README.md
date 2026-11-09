@@ -344,7 +344,7 @@ Relative paths resolve against the project root.
 | --- | --- | --- |
 | "Where is the guide to clear cookies? It's been an hour and nothing is loading on your interface!" | Frustrated User | Empathetic numbered steps; cites `browser_troubleshooting.txt`; no escalation |
 | "What are the header parameter requirements for your bearer token auth implementation? Include the exact error codes for an invalid key." | Technical Expert | Diagnosis/root cause/steps; `Authorization: Bearer`, `401`, `auth_token_expired`; cites `api_authentication.md` |
-| "Our operational uptime is decreasing. We need a timeline of when billing disputes are resolved and how this affects our SLA." | Business Executive | Bottom line + impact/timeline/next step; cites SLA and refund policy; no escalation (informational) |
+| "Our operational uptime is decreasing. What uptime commitment do we have and who should we contact during an incident?" | Business Executive | Bottom line + impact/timeline/next step; cites `service_level_agreement.md`; no escalation (informational) |
 | "I'm experiencing internal errors on ticket pages from our PostgreSQL database integration." | Technical Expert | Connector diagnostics and root-cause steps; cites `database_connectors.md` |
 | "My billing statement has unexpected duplicate charges. I demand an immediate refund!" | Frustrated User | **Escalates** `sensitive_billing_dispute`; billing handoff with ticket ID and refund-safe next steps |
 | "Can you ship a physical welcome kit to our Antarctic research station, and what import tax applies?" | Any | **Escalates** `low_retrieval_confidence` with no answer; the handoff lists the weakly retrieved sources at their low scores instead of asserting logistics facts |

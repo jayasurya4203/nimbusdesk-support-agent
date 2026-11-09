@@ -45,7 +45,8 @@ EXAMPLES = [
     ),
     (
         "Executive · SLA",
-        "Our operational uptime is decreasing. We need a timeline of when billing disputes are resolved.",
+        "Our operational uptime is decreasing. What uptime commitment do we have and who "
+        "should we contact during an incident?",
     ),
     (
         "Escalate · billing",

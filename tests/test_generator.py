@@ -238,6 +238,28 @@ def test_numbered_steps_already_in_the_answer_are_not_duplicated() -> None:
     assert result.answer == answer
 
 
+def test_inline_numbered_steps_are_not_duplicated() -> None:
+    answer = (
+        "Diagnosis: the token expired. Resolution steps: 1. Refresh the token. "
+        "2. Retry the request with the new Authorization header."
+    )
+    llm = ScriptedLLM(
+        generation={
+            **DEFAULT_GENERATION,
+            "answer": answer,
+            "steps": ["Refresh the access token", "Retry with the new header"],
+        }
+    )
+
+    result = ResponseGenerator(llm).generate(
+        query="token",
+        persona_result=_persona(Persona.TECHNICAL),
+        chunks=_chunks(),
+    )
+
+    assert result.answer == answer
+
+
 def test_executive_answers_keep_steps_out_of_the_body() -> None:
     llm = ScriptedLLM(
         generation={
@@ -278,3 +300,4 @@ def test_persona_specific_instructions_are_sent_to_the_model(
     system_instruction = llm.calls[-1]["system_instruction"]
     assert expected_style in system_instruction
     assert "Do not use outside knowledge" in system_instruction
+    assert "Do not set needs_escalation for informational questions" in system_instruction

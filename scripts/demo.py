@@ -48,14 +48,14 @@ CASES: list[dict] = [
         "show": "Exact headers, 401 error codes, and verification steps.",
     },
     {
-        "title": "Business executive: uptime and billing-dispute timelines",
+        "title": "Business executive: uptime commitment and incident contacts",
         "messages": [
-            "Our operational uptime is decreasing. We need a timeline of when billing "
-            "disputes are resolved and how this affects our SLA."
+            "Our operational uptime is decreasing. What uptime commitment do we have and "
+            "who should we contact during an incident?"
         ],
         "expect_persona": Persona.EXECUTIVE,
         "expect_escalation": False,
-        "show": "Concise impact and timeline answer without endpoint detail.",
+        "show": "Bottom line, documented uptime commitment, and a clear next step.",
     },
     {
         "title": "Technical expert: database connector internal errors",
