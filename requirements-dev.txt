@@ -1,0 +1,5 @@
+-r requirements.txt
+
+# Development and testing only
+pytest==9.2.0
+reportlab==5.1.0

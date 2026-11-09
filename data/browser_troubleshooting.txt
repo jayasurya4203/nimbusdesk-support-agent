@@ -1,0 +1,112 @@
+NIMBUSDESK WEB APP - BROWSER TROUBLESHOOTING
+Last updated: 2026-08-21
+Owner: Web Platform
+Applies to: app.nimbusdesk.io
+
+1. SUPPORTED BROWSERS
+=====================
+- Google Chrome: latest two major versions (recommended)
+- Microsoft Edge: latest two major versions
+- Mozilla Firefox: latest two major versions
+- Apple Safari: 16.4 and later
+- Opera and Brave are supported as Chromium-based, but are not tested in CI.
+
+Internet Explorer is not supported. Embedded webviews inside other
+applications (for example in-app browsers) are not supported.
+
+2. FIRST-LINE CHECKS
+====================
+Ask the customer to:
+1. Reload the page with a hard refresh:
+   - Windows/Linux: Ctrl + Shift + R or Ctrl + F5
+   - macOS: Cmd + Shift + R
+2. Confirm the browser is updated to the latest version.
+3. Try an incognito or private window. If the app works there, the issue is
+   almost always an extension or cached data.
+4. Try a different network. Corporate proxies and VPNs can block
+   app.nimbusdesk.io or its websocket endpoint (wss://realtime.nimbusdesk.io).
+5. Check https://status.nimbusdesk.io for an active incident.
+
+3. CLEARING CACHE AND COOKIES (CHROME / EDGE)
+=============================================
+Option A - site-specific (recommended, keeps other sites signed in):
+1. Open https://app.nimbusdesk.io.
+2. Click the padlock icon in the address bar.
+3. Select "Site settings".
+4. Click "Delete data" (Chrome) or "Cookies and site data" then delete (Edge).
+5. Close all NimbusDesk tabs and sign in again.
+
+Option B - time range:
+1. Open Settings > Privacy and security > Delete browsing data.
+2. Choose "Cookies and other site data" and "Cached images and files".
+3. Set the time range to "Last 24 hours" and delete.
+4. Restart the browser.
+
+Firefox:
+1. Open Settings > Privacy & Security > Cookies and Site Data > Manage Data.
+2. Search for nimbusdesk.io and remove the entries.
+3. Clear cached web content, then reload.
+
+Safari:
+1. Safari > Settings > Privacy > Manage Website Data.
+2. Search for nimbusdesk.io, select it, and click Remove.
+3. Empty the cache via the Develop menu if enabled.
+
+4. THIRD-PARTY COOKIES AND TRACKING PROTECTION
+=============================================
+NimbusDesk uses first-party cookies for sessions and does not require
+third-party cookies for core functionality. However, "block all cookies"
+settings and strict tracking protection can prevent SSO redirects from
+completing. Allow cookies for app.nimbusdesk.io and for the identity
+provider domain.
+
+If the user sees "sso_state_mismatch" after signing in, the browser blocked
+the state cookie. Add an exception for both domains and retry.
+
+5. COMMON SYMPTOMS AND CAUSES
+=============================
+Symptom: Blank white page after login.
+Cause: Stale service worker or blocked JavaScript bundle.
+Fix: Hard refresh; if it persists, clear site data and disable extensions
+that block scripts, then retry.
+
+Symptom: Infinite loading spinner on the ticket list.
+Cause: Websocket connection blocked by a proxy, or an ad blocker filtering
+wss://realtime.nimbusdesk.io.
+Fix: Allow the websocket domain, or use the "Disable realtime updates"
+option under Profile > Preferences. Refresh is then manual.
+
+Symptom: "Your session has expired" every few minutes.
+Cause: Browser blocking cookies, or the system clock is incorrect.
+Fix: Enable cookies, set the operating system clock to automatic, and sign
+in again.
+
+Symptom: Attachments do not upload.
+Cause: An extension blocking uploads, or a corporate proxy limiting upload
+size. NimbusDesk limits a single attachment to 25 MB.
+Fix: Try incognito, then test on another network.
+
+Symptom: Keyboard shortcuts or drag-and-drop stop working.
+Cause: Browser extension conflict.
+Fix: Disable extensions one by one, starting with script managers.
+
+6. EXTENSION CONFLICTS
+======================
+Known conflicts have been reported with some ad blockers, password managers
+that aggressively autofill, and script managers. Test in incognito with
+extensions disabled. If the issue disappears, re-enable extensions one at a
+time. NimbusDesk support cannot troubleshoot third-party extensions.
+
+7. WHEN TO ESCALATE
+===================
+Escalate to the Web Platform team if:
+- The issue reproduces in a clean browser profile on a different network
+  and for multiple users in the same workspace.
+- The browser console shows errors from NimbusDesk's own domains (not from
+  extensions or third-party scripts).
+- Users cannot sign in at all after clearing site data and confirming that
+  the identity provider is healthy.
+
+Collect: browser name and version, OS, workspace ID, exact error text, a
+screenshot of the console (redact tokens), the time in UTC, and whether the
+issue occurs in incognito. Never ask for passwords or MFA codes.

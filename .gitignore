@@ -1,0 +1,23 @@
+# Secrets
+.env
+.streamlit/secrets.toml
+
+# Generated runtime state
+chroma_db/
+handoffs/
+feedback/
+demo_output/
+.tmp_*/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.DS_Store

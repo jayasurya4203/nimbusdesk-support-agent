@@ -1,0 +1,102 @@
+NIMBUSDESK BILLING POLICIES
+Last updated: 2026-07-14
+Owner: Finance Operations
+Applies to: Starter, Growth, Scale, Enterprise plans
+
+1. BILLING CYCLES
+=================
+1.1 Workspaces are billed monthly or annually. The billing cycle starts on
+the date of first paid subscription and renews on the same day each month
+or year. If that day does not exist in a given month (for example the 31st),
+the invoice is issued on the last day of that month.
+
+1.2 Invoices are issued at 00:00 UTC on the renewal date and are also
+available in Settings > Billing > Invoices. Finance Operations does not email
+PDF invoices automatically; the workspace Billing Admin can enable
+"Invoice notifications" in billing settings.
+
+1.3 Payment is collected automatically using the payment method on file.
+If the charge fails, NimbusDesk retries on days 3, 7 and 14 after the
+invoice date. The workspace enters read-only mode on day 21 if the invoice
+remains unpaid. Data is retained for 60 days in read-only mode before
+offboarding begins.
+
+2. SEATS AND PRORATION
+======================
+2.1 Plans are priced per active seat. A seat is consumed by any user who can
+sign in to the workspace, including users who are invited but have not yet
+accepted. Service accounts do not consume seats.
+
+2.2 Adding a seat mid-cycle generates a prorated charge for the remaining
+days in the current cycle, calculated to the day. Removing a seat does not
+generate an automatic credit; the seat becomes available for reassignment
+until the next renewal.
+
+2.3 Downgrades take effect at the next renewal date. Upgrades apply
+immediately and are prorated. The plan's API rate limit changes when the
+plan change takes effect.
+
+3. TAXES AND CURRENCY
+=====================
+3.1 Prices are listed in USD. Workspaces with a billing address in the EU or
+UK may be invoiced in EUR or GBP at the exchange rate published on the
+invoice date. Currency is fixed at the time the subscription starts and can
+only be changed once per 12 months.
+
+3.2 Tax is calculated using the billing address and VAT/GST identifier on
+file. A valid VAT ID removes VAT for EU B2B customers under the reverse-charge
+mechanism. Changing a billing address does not retroactively change tax on
+issued invoices.
+
+4. PAYMENT METHODS
+==================
+4.1 Accepted methods: major credit and debit cards, ACH direct debit (US
+workspaces only, annual plans), and wire transfer (annual contracts above
+USD 10,000, Enterprise only).
+
+4.2 Only a Billing Admin can update the payment method. Support cannot update
+payment details, add cards, or process a payment on a customer's behalf.
+Requests to change a payment method are account-sensitive and must be
+handled through the self-serve billing portal or escalated to Finance
+Operations if the portal fails.
+
+5. REFUNDS AND DISPUTES
+=======================
+5.1 Refund eligibility, duplicate-charge investigations, and dispute
+handling are governed by refund_and_dispute_policy.md. Finance Operations is
+the only team that can approve a refund or issue a credit note. Support agents
+must not promise a refund, credit, or waived fee.
+
+5.2 If a customer reports a duplicate charge, an unexpected charge, or a
+charge they believe is fraudulent, treat the case as account-sensitive and
+escalate. Do not ask the customer to send full card numbers or CVV codes.
+
+6. CANCELLATION
+===============
+6.1 A workspace Owner can cancel from Settings > Billing > Cancel plan. The
+workspace remains active until the end of the paid period, then becomes
+read-only for 30 days before data deletion is scheduled.
+
+6.2 Cancellation does not automatically issue a refund for unused time.
+Annual plans can request a prorated refund within 14 days of the annual
+renewal, subject to review by Finance Operations.
+
+7. BILLING CONTACTS
+===================
+7.1 Only the Billing Admin on file can request invoices, tax documents, or
+billing changes. If the Billing Admin has left the company, the workspace
+Owner must transfer the Billing Admin role in Settings > Members > Roles.
+
+7.2 For invoice copies, direct the customer to Settings > Billing > Invoices.
+Support cannot attach invoices that are older than 24 months without Finance
+Operations approval.
+
+8. SUPPORT BOUNDARIES
+=====================
+8.1 Support may explain how billing works, where to find invoices, and how
+proration is calculated, using this policy as the only source of truth.
+
+8.2 Support may not: issue refunds, apply credits, change a payment method,
+edit an invoice, waive fees, extend a trial, or cancel a subscription on the
+customer's behalf. These actions require Finance Operations or the customer's
+own self-serve action.
