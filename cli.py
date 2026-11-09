@@ -85,6 +85,7 @@ def build_agent(settings: Settings, rebuild: bool) -> SupportAgent:
             batch_size=settings.embedding_batch_size,
             max_retries=settings.max_retries,
             base_delay_s=settings.retry_base_delay_s,
+            inputs_per_minute=settings.embedding_inputs_per_minute,
         )
         KnowledgeBase(settings, embedder).build(progress=_progress)
         print()

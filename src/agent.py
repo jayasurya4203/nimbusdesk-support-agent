@@ -110,6 +110,7 @@ class SupportAgent:
             batch_size=settings.embedding_batch_size,
             max_retries=settings.max_retries,
             base_delay_s=settings.retry_base_delay_s,
+            inputs_per_minute=settings.embedding_inputs_per_minute,
         )
         knowledge_base = KnowledgeBase(settings, embedder)
         if not knowledge_base.exists():

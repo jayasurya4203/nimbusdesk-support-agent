@@ -75,6 +75,7 @@ class Settings:
     embedding_model: str = "gemini-embedding-001"
     embedding_dimensions: int = 768
     embedding_batch_size: int = 32
+    embedding_inputs_per_minute: int = 90
     max_retries: int = 4
     retry_base_delay_s: float = 1.5
 
@@ -141,6 +142,7 @@ class Settings:
             embedding_model=_env_str("EMBEDDING_MODEL", "gemini-embedding-001"),
             embedding_dimensions=_env_int("EMBEDDING_DIMENSIONS", 768),
             embedding_batch_size=_env_int("EMBEDDING_BATCH_SIZE", 32),
+            embedding_inputs_per_minute=_env_int("EMBEDDING_INPUTS_PER_MINUTE", 90),
             max_retries=_env_int("MAX_RETRIES", 4),
             retry_base_delay_s=_env_float("RETRY_BASE_DELAY_S", 1.5),
             data_dir=_env_path("DATA_DIR", "data"),

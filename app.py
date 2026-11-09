@@ -163,6 +163,7 @@ def build_index(settings: Settings, top_k: int, min_similarity: float) -> dict:
         batch_size=overridden.embedding_batch_size,
         max_retries=overridden.max_retries,
         base_delay_s=overridden.retry_base_delay_s,
+        inputs_per_minute=overridden.embedding_inputs_per_minute,
     )
     kb = KnowledgeBase(overridden, embedder)
     progress = st.progress(0.0, text="Parsing documents…")

@@ -105,12 +105,13 @@ def main() -> int:
         batch_size=settings.embedding_batch_size,
         max_retries=settings.max_retries,
         base_delay_s=settings.retry_base_delay_s,
+        inputs_per_minute=settings.embedding_inputs_per_minute,
     )
     print(f"Embedding with {settings.embedding_model} ({settings.embedding_dimensions} dims)")
     kb = KnowledgeBase(settings, embedder)
     stats = kb.build(progress=_progress)
     print()
-    _print_table(SimpleNamespace(**doc) for doc in stats["documents"])
+    _print_table([SimpleNamespace(**doc) for doc in stats["documents"]])
     print(
         f"\nIndexed {stats['chunk_count']} chunks in {settings.chroma_dir} "
         f"at {stats['built_at']}"

@@ -8,6 +8,7 @@ re-normalizing when ``output_dimensionality`` is below the model default.
 from __future__ import annotations
 
 import logging
+import time
 from typing import Protocol, Sequence, runtime_checkable
 
 from .llm import LLMError, retry_with_backoff
@@ -43,6 +44,7 @@ class GeminiEmbedder:
         batch_size: int = 32,
         max_retries: int = 4,
         base_delay_s: float = 1.5,
+        inputs_per_minute: int = 90,
     ) -> None:
         if not api_key:
             raise LLMError("A Gemini API key is required for embeddings")
@@ -55,6 +57,8 @@ class GeminiEmbedder:
         self.batch_size = max(1, batch_size)
         self.max_retries = max_retries
         self.base_delay_s = base_delay_s
+        # The free tier counts each embedded text against a per-minute budget.
+        self.inputs_per_minute = max(0, inputs_per_minute)
 
     def _embed(self, texts: Sequence[str], task_type: str) -> list[list[float]]:
         from google.genai import types
@@ -76,8 +80,19 @@ class GeminiEmbedder:
             return [_normalize(item.values or []) for item in embeddings]
 
         vectors: list[list[float]] = []
+        window_started = time.monotonic()
+        window_inputs = 0
         for start in range(0, len(texts), self.batch_size):
             batch = list(texts[start : start + self.batch_size])
+            if self.inputs_per_minute:
+                if window_inputs + len(batch) > self.inputs_per_minute:
+                    wait = 60.0 - (time.monotonic() - window_started)
+                    if wait > 0:
+                        LOGGER.info("Embedding quota window full; waiting %.0fs", wait)
+                        time.sleep(wait)
+                    window_started = time.monotonic()
+                    window_inputs = 0
+                window_inputs += len(batch)
             vectors.extend(
                 retry_with_backoff(
                     lambda batch=batch: _call(batch),

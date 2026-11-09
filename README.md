@@ -93,7 +93,7 @@ The orchestration is explicit Python (`src/agent.py`) rather than an opaque agen
 │   ├── build_kb_pdf.py         Regenerates the PDF KB article (dev only)
 │   ├── demo.py                 Nine-scenario end-to-end demo + transcript
 │   └── ingest.py               Index build / freshness check / dry run
-├── tests/                      96 pytest tests (fake LLM + fake embedder; no API calls)
+├── tests/                      99 pytest tests (fake LLM + fake embedder; no API calls)
 ├── requirements.txt
 ├── requirements-dev.txt
 ├── .env.example
@@ -311,6 +311,7 @@ The demo calls the real Gemini agent across nine scenarios and writes `demo_outp
 | `EMBEDDING_MODEL` | `gemini-embedding-001` | Embedding model |
 | `EMBEDDING_DIMENSIONS` | `768` | Output dimensionality |
 | `EMBEDDING_BATCH_SIZE` | `32` | Ingestion batch size |
+| `EMBEDDING_INPUTS_PER_MINUTE` | `90` | Paces embedding calls under the free-tier 100-inputs/min limit; `0` disables pacing |
 | `MAX_RETRIES` | `4` | Retries for 429/5xx/timeouts |
 | `RETRY_BASE_DELAY_S` | `1.5` | Exponential backoff base |
 | `CHUNK_SIZE` | `900` | Characters per chunk |
@@ -386,7 +387,7 @@ Notes for hosted deployments:
 ## Testing
 
 ```bash
-pytest -q          # 96 tests
+pytest -q          # 99 tests
 ruff check .       # lint (E/F/I rule set pinned in ruff.toml)
 ```
 
@@ -395,6 +396,7 @@ Coverage includes:
 - real-corpus parsing and metadata (19 docs, 181 chunks, PDF pages, footer stripping);
 - chunking, IDs, and overlap validation;
 - index build, cosine space, retrieval ranking, top-k, thresholding, and staleness detection;
+- retry backoff that honors Gemini's `RetryInfo` delay, and embedding pacing under the free-tier minute budget;
 - rule and LLM persona classification, forced personas, hysteresis, frustration scoring;
 - sensitive-topic detection for every category, actions-only vs always modes, custom terms;
 - every escalation trigger and refusal to escalate an answerable informational question;

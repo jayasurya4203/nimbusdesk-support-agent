@@ -45,6 +45,23 @@ def _is_retryable(exc: Exception) -> bool:
     return any(marker.upper() in text for marker in _RETRYABLE_MARKERS)
 
 
+def _server_retry_delay(exc: Exception) -> float:
+    """Read Gemini's RetryInfo hint (``retryDelay: "35s"``) when present."""
+    details = getattr(exc, "details", None)
+    if not isinstance(details, dict):
+        return 0.0
+    error = details.get("error", details)
+    for detail in error.get("details") or []:
+        if str(detail.get("@type", "")).endswith("RetryInfo"):
+            raw = str(detail.get("retryDelay", "")).strip()
+            if raw.endswith("s"):
+                try:
+                    return float(raw[:-1])
+                except ValueError:
+                    return 0.0
+    return 0.0
+
+
 def retry_with_backoff(
     func,
     *,
@@ -62,6 +79,7 @@ def retry_with_backoff(
             if attempt >= max_retries - 1 or not _is_retryable(exc):
                 break
             delay = base_delay_s * (2**attempt) + random.uniform(0, 0.5)
+            delay = max(delay, _server_retry_delay(exc) + 1.0)
             LOGGER.warning(
                 "%s failed (attempt %d/%d): %s. Retrying in %.1fs",
                 label,
