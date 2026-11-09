@@ -93,7 +93,7 @@ The orchestration is explicit Python (`src/agent.py`) rather than an opaque agen
 │   ├── build_kb_pdf.py         Regenerates the PDF KB article (dev only)
 │   ├── demo.py                 Nine-scenario end-to-end demo + transcript
 │   └── ingest.py               Index build / freshness check / dry run
-├── tests/                      99 pytest tests (fake LLM + fake embedder; no API calls)
+├── tests/                      100 pytest tests (fake LLM + fake embedder; no API calls)
 ├── requirements.txt
 ├── requirements-dev.txt
 ├── .env.example
@@ -387,7 +387,7 @@ Notes for hosted deployments:
 ## Testing
 
 ```bash
-pytest -q          # 99 tests
+pytest -q          # 100 tests
 ruff check .       # lint (E/F/I rule set pinned in ruff.toml)
 ```
 

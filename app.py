@@ -176,30 +176,48 @@ def build_index(settings: Settings, top_k: int, min_similarity: float) -> dict:
     return stats
 
 
+def _already_escalated(reply: AgentReply) -> bool:
+    return any(
+        reason.code == "already_escalated" for reason in reply.escalation.reasons
+    )
+
+
 def render_badges(reply: AgentReply) -> None:
     persona = reply.persona
     class_name, icon = PERSONA_STYLES.get(persona.persona, ("persona-tech", "🎧"))
-    status = (
-        '<span class="meta-pill warn">escalated</span>'
-        if reply.escalation.escalate
-        else '<span class="meta-pill ok">grounded answer</span>'
-    )
+    if _already_escalated(reply):
+        status = '<span class="meta-pill warn">with human</span>'
+        scores = '<span class="meta-pill">retrieval not re-run</span>'
+    else:
+        status = (
+            '<span class="meta-pill warn">escalated</span>'
+            if reply.escalation.escalate
+            else '<span class="meta-pill ok">grounded answer</span>'
+        )
+        scores = (
+            f'<span class="meta-pill">retrieval {reply.retrieval_confidence:.2f}</span>'
+            f'<span class="meta-pill">response {reply.response_confidence:.2f}</span>'
+        )
     source = "manual" if reply.persona.source == "manual" else persona.source
     st.markdown(
         '<div class="meta-row">'
         f'<span class="persona-badge {class_name}">{icon} {persona.persona.value}</span> '
         f'<span class="meta-pill">{persona.confidence:.0%} · {source}</span>'
         f'<span class="meta-pill">frustration {persona.frustration_score:.2f}</span>'
-        f'<span class="meta-pill">retrieval {reply.retrieval_confidence:.2f}</span>'
-        f'<span class="meta-pill">response {reply.response_confidence:.2f}</span>'
-        f"{status}</div>",
+        f"{scores}{status}</div>",
         unsafe_allow_html=True,
     )
 
 
 def render_sources(reply: AgentReply) -> None:
     if not reply.sources:
-        st.caption("No knowledge-base chunks were retrieved.")
+        if _already_escalated(reply):
+            st.caption(
+                "Retrieval is not re-run after a handoff; the ticket keeps the sources "
+                "from the escalated turn."
+            )
+        else:
+            st.caption("No knowledge-base chunks were retrieved.")
         return
     with st.expander(f"Retrieved sources · top {len(reply.sources)}", expanded=False):
         for index, chunk in enumerate(reply.sources, start=1):
@@ -441,11 +459,12 @@ def render_sidebar_kb(
                 counts[label] = counts.get(label, 0) + 1
             if counts:
                 st.bar_chart(counts)
+            searched = [r for r in replies if not _already_escalated(r)]
             st.caption(
                 f"{len(replies)} turn(s) · "
                 f"{sum(1 for r in replies if r.escalation.escalate)} escalation(s) · "
                 f"avg retrieval "
-                f"{sum(r.retrieval_confidence for r in replies) / max(len(replies), 1):.2f}"
+                f"{sum(r.retrieval_confidence for r in searched) / max(len(searched), 1):.2f}"
             )
 
 

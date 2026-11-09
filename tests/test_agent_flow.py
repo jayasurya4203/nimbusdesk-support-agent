@@ -159,8 +159,24 @@ def test_follow_up_after_escalation_returns_ticket_status(agent_factory) -> None
     assert ticket in second.message
     assert second.handoff == first.handoff
     assert second.handoff_paths == first.handoff_paths
+    assert second.sources == []
+    assert second.retrieval_confidence == 0.0
     assert session.escalated is True
     assert session.turn_count == 2
+
+
+def test_follow_up_reclassifies_the_new_message(agent_factory) -> None:
+    llm = ScriptedLLM(persona=_persona(Persona.FRUSTRATED, frustration=0.9))
+    agent, _, _ = agent_factory(llm=llm)
+    session = agent.new_session()
+
+    agent.respond(session, "I demand an immediate refund for duplicate charges!")
+    llm.persona_response = _persona(Persona.TECHNICAL, frustration=0.0)
+    second = agent.respond(session, "Which API error code should the webhook return?")
+
+    assert second.persona.persona is Persona.TECHNICAL
+    assert second.persona.source == "llm"
+    assert session.persona is Persona.TECHNICAL
 
 
 def test_low_retrieval_confidence_escalates_without_generating(agent_factory) -> None:

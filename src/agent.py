@@ -153,7 +153,7 @@ class SupportAgent:
         timings: dict[str, int] = {}
 
         if session.escalated:
-            return self._respond_after_escalation(session, message)
+            return self._respond_after_escalation(session, message, forced_persona)
 
         classify_started = time.perf_counter()
         persona_result = self.classifier.classify(
@@ -374,12 +374,22 @@ class SupportAgent:
             forced_persona=persona_result.source == "manual",
         )
 
-    def _respond_after_escalation(self, session: Session, message: str) -> AgentReply:
-        persona_result = session.persona_result or PersonaResult(
-            persona=session.persona or Persona.FRUSTRATED,
-            confidence=0.5,
-            source="session",
+    def _respond_after_escalation(
+        self,
+        session: Session,
+        message: str,
+        forced_persona: Persona | None = None,
+    ) -> AgentReply:
+        # The ticket owns the answer now, but the badge should still describe
+        # the message the customer just sent rather than the escalated turn.
+        persona_result = self.classifier.classify(
+            message,
+            session.recent_history(),
+            previous=session.persona,
+            forced=forced_persona,
         )
+        session.persona = persona_result.persona
+        session.persona_result = persona_result
         session.add_turn(
             Turn(
                 role="user",
@@ -434,9 +444,9 @@ class SupportAgent:
             escalation=decision,
             handoff=session.handoff,
             handoff_paths=session.handoff_paths,
-            retrieval_confidence=session.last_retrieval_score,
+            retrieval_confidence=0.0,
             response_confidence=0.0,
-            forced_persona=False,
+            forced_persona=persona_result.source == "manual",
         )
 
     def _is_negative(self, message: str, persona_result: PersonaResult) -> bool:
