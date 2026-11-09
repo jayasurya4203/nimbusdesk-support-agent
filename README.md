@@ -387,6 +387,7 @@ Notes for hosted deployments:
 
 ```bash
 pytest -q          # 96 tests
+ruff check .       # lint (E/F/I rule set pinned in ruff.toml)
 ```
 
 Coverage includes:
